@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Digital Signature - RedactIQ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            border: none;
+        }
+        .signature-preview {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #f8f9fa;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+        }
+        .verification-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <div class="container">
+            <h1 class="display-4"><i class="fas fa-signature me-2"></i>Digital Signature</h1>
+            <p class="lead">Add secure digital signature to your redacted document</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Apply Digital Signature</h3>
+                        <a href="/" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Redaction
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Document Information</h6>
+                            <p class="mb-0"><strong>File:</strong> {{ filename }}</p>
+                        </div>
+
+                        <form id="signatureForm">
+                            <input type="hidden" name="document_path" value="{{ filename }}">
+                            
+                            <div class="mb-4">
+                                <label for="signerName" class="form-label">Signer Name *</label>
+                                <input type="text" class="form-control form-control-lg" id="signerName" name="signer_name" 
+                                       placeholder="Enter your full name" required>
+                                <div class="form-text">This name will be permanently embedded in the digital signature.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Signature Type</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="signatureType" id="standardSig" value="standard" checked>
+                                            <label class="form-check-label" for="standardSig">
+                                                <i class="fas fa-signature me-1"></i> Standard Signature
+                                            </label>
+                                            <div class="form-text">Basic digital signature with verification</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="signatureType" id="advancedSig" value="advanced">
+                                            <label class="form-check-label" for="advancedSig">
+                                                <i class="fas fa-shield-alt me-1"></i> Advanced Signature
+                                            </label>
+                                            <div class="form-text">Enhanced security with timestamp authority</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Signature Preview</label>
+                                <div class="signature-preview">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-signature"></i>
+                                    </div>
+                                    <p class="text-muted">Digital signature will be applied to your document</p>
+                                    <div id="signerPreview" class="mt-2" style="display: none;">
+                                        <strong>Signer:</strong> <span id="previewName"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                    <label class="form-check-label" for="agreeTerms">
+                                        I certify that I am authorized to sign this document and that the information contained is accurate to the best of my knowledge.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg" id="signButton">
+                                    <i class="fas fa-pen-fancy me-2"></i>Apply Digital Signature
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-shield-alt me-2"></i>Security Features</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <i class="fas fa-check text-success me-2"></i>Document Integrity Protection
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check text-success me-2"></i>Tamper-Evident Seal
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check text-success me-2"></i>Timestamp Authority
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check text-success me-2"></i>Digital Certificate
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check text-success me-2"></i>Legal Compliance
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-download me-2"></i>After Signing</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-file-pdf me-2"></i>You will receive:</h6>
+                            <ul class="mb-0">
+                                <li>Digitally Signed Document</li>
+                                <li>Signature Certificate</li>
+                                <li>Verification Guide</li>
+                            </ul>
+                        </div>
+                        <p class="text-muted small">
+                            The signed document can be verified by anyone using our signature verification tool to confirm its authenticity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section (initially hidden) -->
+        <div id="signatureResults" class="row mt-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="card-title mb-0"><i class="fas fa-check-circle me-2"></i>Signature Applied Successfully!</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <h6><i class="fas fa-signature me-2"></i>Signature Details</h6>
+                                    <p><strong>Signature ID:</strong> <span id="resultSignatureId"></span></p>
+                                    <p><strong>Signer:</strong> <span id="resultSigner"></span></p>
+                                    <p><strong>Timestamp:</strong> <span id="resultTimestamp"></span></p>
+                                    <p><strong>Status:</strong> <span class="badge bg-success">VALID</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-download me-2"></i>Download Files</h6>
+                                    <div class="d-grid gap-2">
+                                        <a href="#" class="btn btn-success" id="downloadSignedBtn">
+                                            <i class="fas fa-file-pdf me-2"></i>Download Signed Document
+                                        </a>
+                                        <a href="#" class="btn btn-outline-success" id="downloadCertificateBtn">
+                                            <i class="fas fa-certificate me-2"></i>Download Certificate
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <a href="/" class="btn btn-primary">
+                                <i class="fas fa-redo me-2"></i>Sign Another Document
+                            </a>
+                            <button class="btn btn-outline-primary" onclick="showVerificationGuide()">
+                                <i class="fas fa-question-circle me-2"></i>Verification Guide
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verification Guide Modal -->
+    <div class="modal fade" id="verificationGuideModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Digital Signature Verification Guide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>How to Verify a Digital Signature:</h6>
+                    <ol>
+                        <li>Go to the main RedactIQ page</li>
+                        <li>Click "Verify Signature" button</li>
+                        <li>Upload the signed document</li>
+                        <li>System will validate the signature</li>
+                        <li>View the verification results</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Important Notes:</h6>
+                        <ul class="mb-0">
+                            <li>Only documents signed through RedactIQ can be verified</li>
+                            <li>Signature verification is free and available to anyone</li>
+                            <li>Keep your signature certificate safe for future reference</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light text-center p-4 mt-5">
+        <p>RedactIQ &copy; 2023 - Secure Document Redaction & Digital Signatures</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update signature preview when name changes
+        document.getElementById('signerName').addEventListener('input', function() {
+            const previewName = document.getElementById('previewName');
+            const signerPreview = document.getElementById('signerPreview');
+            
+            if (this.value.trim()) {
+                previewName.textContent = this.value;
+                signerPreview.style.display = 'block';
+            } else {
+                signerPreview.style.display = 'none';
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('signatureForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const signButton = document.getElementById('signButton');
+            const originalText = signButton.innerHTML;
+            
+            // Show loading state
+            signButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Applying Signature...';
+            signButton.disabled = true;
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('/apply-signature', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success results
+                    document.getElementById('signatureResults').style.display = 'block';
+                    document.getElementById('resultSignatureId').textContent = result.signature_id;
+                    document.getElementById('resultSigner').textContent = document.getElementById('signerName').value;
+                    document.getElementById('resultTimestamp').textContent = new Date().toLocaleString();
+                    
+                    // Set download links with the actual file paths from the server response
+                    // Extract just the filename from the full path
+                    const signedFilename = result.signed_document.split('/').pop();
+                    const certificateFilename = result.certificate.split('/').pop();
+                    
+                    document.getElementById('downloadSignedBtn').href = '/download-signed/' + encodeURIComponent(signedFilename);
+                    document.getElementById('downloadCertificateBtn').href = '/download-certificate/' + encodeURIComponent(certificateFilename);
+                    
+                    // Scroll to results
+                    document.getElementById('signatureResults').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error applying signature: ' + error.message);
+                console.error('Signature error:', error);
+            } finally {
+                // Reset button
+                signButton.innerHTML = originalText;
+                signButton.disabled = false;
+            }
+        });
+
+        function showVerificationGuide() {
+            const modal = new bootstrap.Modal(document.getElementById('verificationGuideModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>
